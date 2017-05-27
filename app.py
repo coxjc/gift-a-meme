@@ -3,6 +3,7 @@ import requests
 import uuid
 import boto3
 from flask import Flask, render_template, jsonify, request, redirect
+from werkzeug.utils import secure_filename
 app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
 #end flask setup
@@ -10,6 +11,7 @@ app.config.from_object(os.environ['APP_SETTINGS'])
 aws_key = os.environ['aws_key']
 aws_secret = os.environ['aws_secret']
 aws_bucket= os.environ['aws_bucket']
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 s3_url = 'https://s3.amazonaws.com/'
 # next_url stores the meme to which the next user will be forwarded
 next_url = 'https://i.ytimg.com/vi/JlhGrcaRTdo/maxresdefault.jpg'
@@ -21,12 +23,18 @@ aws = boto3.client(
     aws_secret_access_key=aws_secret
 )
 
+#returns true if allowed extension
+def allowed_file(filename):
+        return '.' in filename and \
+                           filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']
+
 @app.route('/')
 def home():
     return render_template('home.html', count=count)
 
 @app.route('/new', methods=['POST'])
 def new():
+    global next_url, count
     #set uuid for image key
     key = str(uuid.uuid4())
     post = aws.generate_presigned_post(
@@ -36,8 +44,9 @@ def new():
             Conditions=[{"acl": "public-read"}]
     )
     files = {"file": request.files['file']}
+    if not allowed_file(request.files['file']):
+        return render_template('home.html', count=count, error='Invalid file type. Only images, please.')
     response = requests.post(post["url"], data=post["fields"], files=files)
-    global next_url, count
     #update count
     count += 1
     #update urls
