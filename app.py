@@ -44,7 +44,7 @@ def new():
             Conditions=[{"acl": "public-read"}]
     )
     files = {"file": request.files['file']}
-    if request.files['file'] and not allowed_file(request.files['file'].filename):
+    if request.files['file'].filename == '' or not allowed_file(request.files['file'].filename):
         return render_template('home.html', count=count, error='Invalid file type. Only images, please.')
     response = requests.post(post["url"], data=post["fields"], files=files)
     #update count
