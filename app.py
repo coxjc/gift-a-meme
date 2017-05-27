@@ -1,6 +1,6 @@
 import os
-import requests
 import uuid
+import requests
 import boto3
 from flask import Flask, render_template, jsonify, request, redirect
 from werkzeug.utils import secure_filename
@@ -11,7 +11,7 @@ app.config.from_object(os.environ['APP_SETTINGS'])
 aws_key = os.environ['aws_key']
 aws_secret = os.environ['aws_secret']
 aws_bucket= os.environ['aws_bucket']
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 s3_url = 'https://s3.amazonaws.com/'
 # next_url stores the meme to which the next user will be forwarded
 next_url = 'https://i.ytimg.com/vi/JlhGrcaRTdo/maxresdefault.jpg'
@@ -26,7 +26,7 @@ aws = boto3.client(
 #returns true if allowed extension
 def allowed_file(filename):
         return '.' in filename and \
-                           filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']
+                           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/')
 def home():
@@ -44,7 +44,7 @@ def new():
             Conditions=[{"acl": "public-read"}]
     )
     files = {"file": request.files['file']}
-    if not allowed_file(request.files['file']):
+    if request.files['file'] and not allowed_file(request.files['file'].filename):
         return render_template('home.html', count=count, error='Invalid file type. Only images, please.')
     response = requests.post(post["url"], data=post["fields"], files=files)
     #update count
@@ -52,6 +52,7 @@ def new():
     #update urls
     old_url = next_url
     next_url = s3_url + aws_bucket + '/' + key
+    print(request.url_root)
     return render_template('result.html', old_url=old_url, count=count) 
 
 if __name__ == '__main__':

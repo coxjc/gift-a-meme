@@ -21,7 +21,7 @@
                 <h2>Pass a meme to the next person!</h2>
                 <h4>{{error}}</h4>
                 <label class="custom-file">
-                    <form action="http://localhost:5000/new" method="post" enctype="multipart/form-data"> 
+                    <form action="{{request.url_root}}new" method="post" enctype="multipart/form-data"> 
                           File: <input type="file" name="file" accept=".png, .jpg, .jpeg"><br>
                           <input type="submit" value="Submit">
                     </form>
