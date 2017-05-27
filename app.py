@@ -17,6 +17,9 @@ s3_url = 'https://s3.amazonaws.com/'
 next_url = 'https://i.ytimg.com/vi/JlhGrcaRTdo/maxresdefault.jpg'
 # counter
 count = 0
+
+status = open('./status.txt', 'r+')
+count = int(status.readline())
 aws = boto3.client(
     's3',
     aws_access_key_id=aws_key,
@@ -34,7 +37,7 @@ def home():
 
 @app.route('/new', methods=['POST'])
 def new():
-    global next_url, count
+    global next_url, count, status
     #set uuid for image key
     key = str(uuid.uuid4())
     post = aws.generate_presigned_post(
@@ -49,6 +52,9 @@ def new():
     response = requests.post(post["url"], data=post["fields"], files=files)
     #update count
     count += 1
+    status.write(str(count))
+    status.close()
+    status = open('./status.txt', 'r+')
     #update urls
     old_url = next_url
     next_url = s3_url + aws_bucket + '/' + key
