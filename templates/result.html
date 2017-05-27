@@ -10,23 +10,21 @@
   <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Modak" rel="stylesheet">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"></link>
-  <link rel="stylesheet" href="{{ url_for('static',filename='styles/hello.css') }}" type="text/css">
+  <link rel="stylesheet" href="{{ url_for('static',filename='styles/home.css') }}" type="text/css">
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
   <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js" type="text/javascript"></script>
   </head>
   <body>
       <div class="container" id="main">
           <div class="container text-center">
-                <h1 id="title-logo">MemeRoulette</h1>
+                <h1 id="title-logo">GiftAMeme.com</h1>
                 <h2>Pass a meme to the next person!</h2>
-                <label class="custom-file">
-                    <input type="file" id="file" class="custom-file-input">
-                    <span class="custom-file-control"></span>
-                </label>
+                <center>
+                    <img src="{{old_url}}" style="width: 100%; max-width: 600px;" />
+                </center>
                 <p>
-                    Submit to be forwarded to the previous person's meme!
                     <br>
-                    <i>XYZ memes passed on!</i>
+                    <i>{{count}} memes passed on!</i>
                 </p>
             </div>
       </div>

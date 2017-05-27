@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>title</title>
+  <meta name="author" content="name">
+  <meta name="description" content="description here">
+  <meta name="keywords" content="keywords,here">
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Modak" rel="stylesheet">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"></link>
+  <link rel="stylesheet" href="{{ url_for('static',filename='styles/home.css') }}" type="text/css">
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js" type="text/javascript"></script>
+  </head>
+  <body>
+      <div class="container" id="main">
+          <div class="container text-center">
+                <h1 id="title-logo">GiftAMeme.com</h1>
+                <h2>Pass a meme to the next person!</h2>
+                <label class="custom-file">
+                    <form action="http://localhost:5000/new" method="post" enctype="multipart/form-data"> 
+                          File: <input type="file" name="file"><br>
+                          <input type="submit" value="Submit">
+                    </form>
+                </label>
+                <p>
+                    Submit to be forwarded to the previous person's meme!
+                    <br>
+                    <span style="font-weight: bold">Participate at your own risk. Illegal images will be reported to authorities.</span>
+                    <br>
+                    <i>{{count}} memes passed on!</i>
+                </p>
+            </div>
+      </div>
+  </body>
+</html>
