@@ -16,4 +16,4 @@ requests==2.16.0
 s3transfer==0.1.10
 six==1.10.0
 urllib3==1.21.1
-Werkzeug==0.12.2
+Werkzeug==0.15.3
