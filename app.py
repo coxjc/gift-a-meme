@@ -8,18 +8,14 @@ app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
 #end flask setup
 #start aws config
-aws_key = os.environ['aws_key']
-aws_secret = os.environ['aws_secret']
-aws_bucket= os.environ['aws_bucket']
+aws_key = os.environ['gam_aws_key']
+aws_secret = os.environ['gam_aws_secret']
+aws_bucket= os.environ['gam_aws_bucket']
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 s3_url = 'https://s3.amazonaws.com/'
 # next_url stores the meme to which the next user will be forwarded
 next_url = 'https://i.ytimg.com/vi/JlhGrcaRTdo/maxresdefault.jpg'
-# counter
-count = 0
 
-status = open('./status.txt', 'r+')
-count = int(status.readline())
 aws = boto3.client(
     's3',
     aws_access_key_id=aws_key,
@@ -33,11 +29,11 @@ def allowed_file(filename):
 
 @app.route('/')
 def home():
+    count = aws.get_object(Bucket=aws_bucket, Key='count')['Body'].read().decode('utf-8')
     return render_template('home.html', count=count)
 
 @app.route('/new', methods=['POST'])
 def new():
-    global next_url, count, status
     #set uuid for image key
     key = str(uuid.uuid4())
     post = aws.generate_presigned_post(
@@ -51,16 +47,13 @@ def new():
         return render_template('home.html', count=count, error='Invalid file type. Only images, please.')
     response = requests.post(post["url"], data=post["fields"], files=files)
     #update count
-    count += 1
-    status.write(str(count))
-    status.close()
-    status = open('./status.txt', 'r+')
-    #update urls
-    old_url = next_url
-    next_url = s3_url + aws_bucket + '/' + key
-    print(request.url_root)
-    return render_template('result.html', old_url=old_url, count=count) 
+
+    count = int(aws.get_object(Bucket=aws_bucket, Key='count')['Body'].read().decode('utf-8'))
+    aws.put_object(Bucket=aws_bucket, Key='count', Body=str(count + 1))
+    to_show = aws.get_object(Bucket=aws_bucket, Key='next')['Body'].read().decode('utf-8')
+    aws.put_object(Bucket=aws_bucket, Key='next', Body=key)
+    to_show_url = s3_url + aws_bucket + '/' + to_show
+    return render_template('result.html', old_url=to_show_url, count=count + 1) 
 
 if __name__ == '__main__':
-    print(os.environ['APP_SETTINGS'])
     app.run()
